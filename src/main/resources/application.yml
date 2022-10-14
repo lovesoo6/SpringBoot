@@ -1,0 +1,66 @@
+spring:
+  #载入数据源配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_imperial_court?serverTimezone=UTC&useUnicode=true&useSSL=false&characterEndcoding=utf-8&allowPublicKeyRetrieval=true
+    username: root
+    password: P@ssw0rd
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      aop-patterns: com.study.springboot.*  #监控SpringBean
+      filters: stat,wall     # 底层开启功能，stat（sql监控），wall（防火墙）
+
+      stat-view-servlet: # 配置监控页功能
+        enabled: true
+        login-username: admin
+        login-password: admin
+        resetEnable: false
+
+      web-stat-filter: # 监控web
+        enabled: true
+        urlPattern: /*
+        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'
+
+
+      filter:
+        stat: # 对上面filters里面的stat的详细配置
+          slow-sql-millis: 1000
+          logSlowSql: true
+          enabled: true
+        wall:
+          enabled: true
+          config:
+            drop-table-allow: false
+management:
+  endpoints:
+    enabled-by-default: true #暴露所有端点信息
+    web:
+      exposure:
+        include: '*'  #以web方式暴露
+  #关闭加载默认图标
+  favicon:
+      enabled: false
+  mvc:
+    hidden-method:
+      filter:
+        enabled: true #开启页面表单的Rest功能
+    content negotiation:
+      favor-parameter: true #开启请求参数内容协商模式
+  session:
+    timeout: 3600
+
+#mybatis与springboot整合需要加载mapper.xml文件指定路径不然会报找不到mapper方法
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+#分页器
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+
+
+
+
+

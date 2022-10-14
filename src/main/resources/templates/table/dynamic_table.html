@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="ThemeBucket">
+    <link rel="shortcut icon" href="#" type="image/png">
+
+    <title>Dynamic Table</title>
+
+    <!--dynamic table-->
+    <link th:href="@{/js/advanced-datatable/css/demo_page.css}" rel="stylesheet"/>
+    <link th:href="@{/js/advanced-datatable/css/demo_table.css}" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/js/data-tables/DT_bootstrap.css}"/>
+
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/style-responsive.css}" rel="stylesheet">
+    <div th:include="common :: commonheader"></div>
+</head>
+
+<body class="sticky-header">
+
+<section>
+
+    <div th:replace="common :: #leftmenu"></div>
+    <!-- main content start-->
+    <div class="main-content">
+
+        <div th:replace="common :: headermenu">
+
+        </div>
+
+        <!-- page heading start-->
+        <div class="page-heading">
+            <h3>
+                Dynamic Table
+            </h3>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">Dashboard</a>
+                </li>
+                <li>
+                    <a href="#">Data Tables</a>
+                </li>
+                <li class="active"> Dynamic Table</li>
+            </ul>
+        </div>
+        <!-- page heading end-->
+
+        <!--body wrapper start-->
+        <div class="wrapper">
+            <div class="row">
+                <div class="col-sm-12">
+                    <section class="panel">
+                        <header class="panel-heading">
+                            Dynamic Table
+                            <span class="tools pull-right">
+                                <a href="javascript:" class="fa fa-chevron-down"></a>
+                                <a href="javascript:" class="fa fa-times"></a>
+                            </span>
+                        </header>
+                        <div class="panel-body" >
+                            <span th:if="${session.loginInfo.empPosition == 'minister'}">
+                                <a th:href="@{'/work/insertwork/'+${session.loginInfo.empId}+'/'+${session.loginInfo.empPosition}}" style="float:right;padding-bottom:2px"><button class="btn btn-success" type="button">有本起奏</button></a>
+                            </span>
+                            <div class="form-group" id="submit_cx">
+                                <form class="form-horizontal bucket-form" th:action="@{'/work/showMemorialsDigestList/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/1/search'}" method="post" >
+                                    <label class="col-sm-2 control-label col-lg-2" style="text-align:right;width: 10%">奏折标题</label>
+                                    <div class="col-lg-10" style="text-align:right;width: 25%">
+                                        <div class="form-group has-error">
+                                            <div >
+                                                <input type="text" class="form-control"  name="memorialsTitle" v-model="memorialsTitle">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <label class="col-sm-2 control-label col-lg-2" style="text-align:right;width: 10%" th:if="${session.loginInfo.empPosition == 'emperor'}">大臣</label>
+                                    <div class="col-lg-10" style="text-align:right;width: 10%" th:if="${session.loginInfo.empPosition == 'emperor'}">
+                                        <div class="form-group has-error">
+                                            <select name="memorialsName" id="" v-model="memorialsName" >
+                                                <option th:each="emp: ${empList}" th:value="${emp.empId}" >[[${emp.empName}]]</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <label class="col-sm-2 control-label col-lg-2" style="text-align:right;width: 10%">状态</label>
+                                    <div class="col-lg-10" style="text-align:right;width: 15%">
+                                        <input type="checkbox" name="memorialsStatus" value="0" v-model="memorialsStatus">未读
+                                        <input type="checkbox" name="memorialsStatus" value="1" v-model="memorialsStatus">已读
+                                        <input type="checkbox" name="memorialsStatus" value="2" v-model="memorialsStatus">已审批
+                                    </div >
+                                    <div class="col-lg-10" style="text-align:right;width: 10%" >
+                                        <button class="btn btn-info" type="submit" >查询</button>
+                                        <button class="btn btn-success"><a th:href="@{'/work/showMemorialsDigestList/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/1'}">返回</a></button>
+                                    </div>
+                                </form>
+
+                            </div>
+                            <div class="adv-table">
+                                <table class="display table table-bordered table-striped" id="dynamic-table">
+                                    <thead>
+                                    <tr>
+                                        <th width="5%">序&emsp;&emsp;号</th>
+                                        <th width="20%">奏折标题</th>
+                                        <th width="35%">内容摘要</th>
+                                        <th width="10%">上疏大臣</th>
+                                        <th width="10%">上疏时间</th>
+                                        <th width="10%">奏折状态</th>
+                                        <th width="10%">奏折详情</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody th:if="${#lists.isEmpty(page.list)}">
+                                        <tr class="gradeX">
+                                            <td colspan="7" STYLE="text-align: center">没有人上过折子</td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody th:if="${not #lists.isEmpty(page.list)}">
+                                    <tr class="gradeX" th:each="memorials,status : ${page.list}">
+                                        <td th:text="${status.count}"></td>
+                                        <td th:switch="${memorials.memorialsStatus}">
+                                            <span th:text="${memorials.memorialsTitle}" th:case="0" style="color: red;">奏折标题</span>
+                                            <span th:text="${memorials.memorialsTitle}" th:case="1" style="color: blue;">奏折标题</span>
+                                            <span th:text="${memorials.memorialsTitle}" th:case="2">奏折标题</span>
+                                        </td>
+                                        <td th:switch="${memorials.memorialsStatus}">
+                                            <span th:text="${memorials.memorialsContent}" th:case="0" style="color: red;">内容摘要</span>
+                                            <span th:text="${memorials.memorialsContent}" th:case="1" style="color: blue;">内容摘要</span>
+                                            <span th:text="${memorials.memorialsContent}" th:case="2">内容摘要</span>
+                                        </td>
+                                        <td th:switch="${memorials.memorialsStatus}">
+                                            <span th:text="${memorials.emp.empName}" th:case="0" style="color: red;">上疏大臣</span>
+                                            <span th:text="${memorials.emp.empName}" th:case="1" style="color: blue;">上疏大臣</span>
+                                            <span th:text="${memorials.emp.empName}" th:case="2">上疏大臣</span>
+                                        </td>
+                                        <td th:switch="${memorials.memorialsStatus}">
+                                            <span th:text="${memorials.memorialsCreateTime}" th:case="0" style="color: red;">上疏时间</span>
+                                            <span th:text="${memorials.memorialsCreateTime}" th:case="1" style="color: blue;">上疏时间</span>
+                                            <span th:text="${memorials.memorialsCreateTime}" th:case="2">上疏时间</span>
+                                        </td>
+                                        <td th:switch="${memorials.memorialsStatus}">
+                                            <span th:case="0" style="color: red;">未读</span>
+                                            <span th:case="1" style="color: blue;">已读</span>
+                                            <span th:case="2">已批示</span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary" type="button"><a th:href="@{'/work/showMemorialsDetail/'+${memorials.memorialsId}+'/'+${session.loginInfo.empPosition}}">奏折详情</a></button>
+                                            <button class="btn btn-warning" type="button"><a th:href="@{'/work/deleteMemorialById/'+${memorials.memorialsId}+'/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/'+${page.getPageNum()}}">删除</a></button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="row-fluid">
+                                    <div class="span6" th:if="${not #lists.isEmpty(page.list)}">
+                                        <div class="dataTables_info" id="dynamic-table_info">
+                                            当前第[[${page.pageNum}]]页  总计 [[${page.pages}]]页  共[[${page.total}]]条记录
+                                        </div>
+                                    </div>
+                                    <div class="span6">
+                                        <div class="dataTables_paginate paging_bootstrap pagination">
+                                            <ul th:if="${not #lists.isEmpty(page.list)}">
+                                                <li class="prev "><a th:href="@{'/work/showMemorialsDigestList/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/1'}">首页</a></li>
+
+
+                                                <li class="prev "><a th:href="@{'/work/showMemorialsDigestList/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/'+${page.prePage}}">← 前一页</a></li>
+
+                                                <li th:class="${num == page.pageNum?'active':''}" th:each="num:${#numbers.sequence(1,page.pages)}" >
+                                                    <a th:href="@{'/work/showMemorialsDigestList/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/'+${num}}">[[${num}]]</a>
+                                                </li>
+                                                <li class="next "><a th:href="@{'/work/showMemorialsDigestList/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/'+${page.nextPage}}">下一页 → </a></li>
+                                                <li class="next "><a th:href="@{'/work/showMemorialsDigestList/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/'+${page.pages}}">末页</a></li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!--body wrapper end-->
+
+            <!--footer section start-->
+            <footer>
+                2020 &copy; AdminEx by ThemeBucket </a>
+            </footer>
+            <!--footer section end-->
+
+
+        </div>
+        <!-- main content end-->
+    </div>
+</section>
+
+
+<div th:replace="common :: #commonscript"></div>
+<!--dynamic table-->
+<script type="text/javascript" language="javascript" src="js/advanced-datatable/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="js/data-tables/DT_bootstrap.js"></script>
+<script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
+<!--dynamic table initialization -->
+<!--<script src="js/dynamic_table_init.js"></script>-->
+<!--vue.js-->
+<script src="/js/vue.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script src="/js/daywork.js"></script>
+</body>
+</html>

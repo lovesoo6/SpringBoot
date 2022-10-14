@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="ThemeBucket">
+    <link rel="shortcut icon" href="#" type="image/png">
+
+    <title>Dynamic Table</title>
+
+    <!--dynamic table-->
+    <link th:href="@{/js/advanced-datatable/css/demo_page.css}" rel="stylesheet"/>
+    <link th:href="@{/js/advanced-datatable/css/demo_table.css}" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/js/data-tables/DT_bootstrap.css}"/>
+
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/style-responsive.css}" rel="stylesheet">
+    <div th:include="common :: commonheader"></div>
+</head>
+
+<body class="sticky-header">
+
+<section>
+
+    <div th:replace="common :: #leftmenu"></div>
+    <!-- main content start-->
+    <div class="main-content">
+
+        <div th:replace="common :: headermenu">
+
+        </div>
+
+        <!-- page heading start-->
+        <div class="page-heading">
+            <h3>
+                Dynamic Table
+            </h3>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#">Dashboard</a>
+                </li>
+                <li>
+                    <a href="#">Data Tables</a>
+                </li>
+                <li class="active"> Dynamic Table</li>
+            </ul>
+        </div>
+        <!-- page heading end-->
+
+        <!--body wrapper start-->
+        <div class="wrapper">
+            <div class="row">
+                <div class="col-sm-12">
+                    <section class="panel">
+                        <header class="panel-heading">
+                            Dynamic Table
+                            <span class="tools pull-right">
+                                <a href="javascript:" class="fa fa-chevron-down"></a>
+                                <a href="javascript:" class="fa fa-times"></a>
+                            </span>
+                        </header>
+                        <div class="panel-body">
+                            <span>
+                                <a th:href="@{'/dayWork/addtwork/'+${session.loginInfo.empId}+'/'+${session.loginInfo.empPosition}}" style="float:right;padding-bottom:2px;;padding-right:50px"><button class="btn btn-success" type="button">增加日志</button></a>&nbsp;&nbsp;
+                            </span>
+                            <span>
+                                <a th:href="@{'/dayWork/exportWork/'+${session.loginInfo.empId}+'/'+${session.loginInfo.empPosition}}" style="float:right;padding-bottom:2px;padding-right:10px"><button class="btn btn-info" type="button">导出Excel</button></a>&nbsp;&nbsp;
+                            </span>
+                            <div class="adv-table">
+                                <table class="display table table-bordered table-striped" id="dynamic-table">
+                                    <thead>
+                                    <tr>
+                                        <th width="5%">序&emsp;&emsp;号</th>
+                                        <th width="20%">填报日期</th>
+                                        <th width="35%">日志详情</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody th:if="${#lists.isEmpty(page.list)}">
+                                        <tr class="gradeX">
+                                            <td colspan="7" STYLE="text-align: center">没有填报日志</td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody th:if="${not #lists.isEmpty(page.list)}">
+                                        <tr class="gradeX" th:each="daywork,status : ${page.list}">
+                                            <td th:text="${status.count}"></td>
+                                            <td>
+                                                <span th:text="${daywork.dayData}" >标题</span>
+                                            </td>
+                                            <td >
+                                                <span th:text="${daywork.dayMiaoshu}" >内容</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-primary" type="button"><a th:href="@{'/dayWork/showDayWorkDetail/'+${daywork.dayId}+'/'+${session.loginInfo.empPosition}}">日志详情</a></button>
+                                                <button class="btn btn-warning" type="button"><a th:href="@{'/dayWork/deleteDayWorkById/'+${daywork.dayId}+'/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/'+${page.pageNum}}">删除</a></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="row-fluid">
+                                    <div class="span6" th:if="${not #lists.isEmpty(page.list)}">
+                                        <div class="dataTables_info" id="dynamic-table_info">
+                                            当前第[[${page.pageNum}]]页  总计 [[${page.pages}]]页  共[[${page.total}]]条记录
+                                        </div>
+                                    </div>
+                                    <div class="span6">
+                                        <div class="dataTables_paginate paging_bootstrap pagination">
+                                            <ul th:if="${not #lists.isEmpty(page.list)}">
+                                                <li class="prev "><a th:href="@{'/dayWork/showDayWork/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/1'}">首页</a></li>
+
+
+                                                <li class="prev "><a th:href="@{'/dayWork/showDayWork/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/'+${page.prePage}}">← 前一页</a></li>
+
+                                                <li th:class="${num == page.pageNum?'active':''}" th:each="num:${#numbers.sequence(1,page.pages)}" >
+                                                    <a th:href="@{'/dayWork/showDayWork/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/'+${num}}">[[${num}]]</a>
+                                                </li>
+                                                <li class="next "><a th:href="@{'/dayWork/showDayWork/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/'+${page.nextPage}}">下一页 → </a></li>
+                                                <li class="next "><a th:href="@{'/dayWork/showDayWork/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/'+${page.pages}}">末页</a></li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!--body wrapper end-->
+
+            <!--footer section start-->
+            <footer>
+                2020 &copy; AdminEx by ThemeBucket </a>
+            </footer>
+            <!--footer section end-->
+
+
+        </div>
+        <!-- main content end-->
+    </div>
+</section>
+
+
+<div th:replace="common :: #commonscript"></div>
+<!--dynamic table-->
+<script type="text/javascript" language="javascript" src="js/advanced-datatable/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="js/data-tables/DT_bootstrap.js"></script>
+<!--dynamic table initialization -->
+<!--<script src="js/dynamic_table_init.js"></script>-->
+
+
+</body>
+</html>
