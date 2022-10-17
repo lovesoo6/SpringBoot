@@ -1,7 +1,6 @@
 var vue = new Vue({
     el:"#submit1",
     data:{
-
     },
     methods:{
         add(){

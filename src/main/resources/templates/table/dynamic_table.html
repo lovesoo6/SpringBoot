@@ -60,37 +60,39 @@
                                 <a href="javascript:" class="fa fa-times"></a>
                             </span>
                         </header>
-                        <div class="panel-body" >
+                        <div class="panel-body" id="submit_xm">
                             <span th:if="${session.loginInfo.empPosition == 'minister'}">
                                 <a th:href="@{'/work/insertwork/'+${session.loginInfo.empId}+'/'+${session.loginInfo.empPosition}}" style="float:right;padding-bottom:2px"><button class="btn btn-success" type="button">有本起奏</button></a>
                             </span>
-                            <div class="form-group" id="submit_cx">
-                                <form class="form-horizontal bucket-form" th:action="@{'/work/showMemorialsDigestList/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/1/search'}" method="post" >
+                            <button class="btn btn-success" @click="sc">删除</button>
+                            <div class="form-group" >
+                                <form class="form-horizontal bucket-form" th:action="@{'/work/showMemorialsDigestListBySerach/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/1/search'}" method="post" >
                                     <label class="col-sm-2 control-label col-lg-2" style="text-align:right;width: 10%">奏折标题</label>
                                     <div class="col-lg-10" style="text-align:right;width: 25%">
                                         <div class="form-group has-error">
                                             <div >
-                                                <input type="text" class="form-control"  name="memorialsTitle" v-model="memorialsTitle">
+                                                <input type="text" class="form-control"  name="memorialsTitle">
                                             </div>
                                         </div>
                                     </div>
                                     <label class="col-sm-2 control-label col-lg-2" style="text-align:right;width: 10%" th:if="${session.loginInfo.empPosition == 'emperor'}">大臣</label>
                                     <div class="col-lg-10" style="text-align:right;width: 10%" th:if="${session.loginInfo.empPosition == 'emperor'}">
                                         <div class="form-group has-error">
-                                            <select name="memorialsName" id="" v-model="memorialsName" >
+                                            <select name="memorialsName" id="" >
                                                 <option th:each="emp: ${empList}" th:value="${emp.empId}" >[[${emp.empName}]]</option>
                                             </select>
                                         </div>
                                     </div>
                                     <label class="col-sm-2 control-label col-lg-2" style="text-align:right;width: 10%">状态</label>
                                     <div class="col-lg-10" style="text-align:right;width: 15%">
-                                        <input type="checkbox" name="memorialsStatus" value="0" v-model="memorialsStatus">未读
-                                        <input type="checkbox" name="memorialsStatus" value="1" v-model="memorialsStatus">已读
-                                        <input type="checkbox" name="memorialsStatus" value="2" v-model="memorialsStatus">已审批
+                                        <input type="checkbox" name="memorialsStatus" th:value="0" >未读
+                                        <input type="checkbox" name="memorialsStatus" th:value="1" >已读
+                                        <input type="checkbox" name="memorialsStatus" th:value="2" >已审批
                                     </div >
-                                    <div class="col-lg-10" style="text-align:right;width: 10%" >
+                                    <div class="col-lg-10" style="text-align:right;width: 20%" >
                                         <button class="btn btn-info" type="submit" >查询</button>
                                         <button class="btn btn-success"><a th:href="@{'/work/showMemorialsDigestList/'+${session.loginInfo.empPosition}+'/'+${session.loginInfo.empId}+'/1'}">返回</a></button>
+
                                     </div>
                                 </form>
 
@@ -115,7 +117,9 @@
                                     </tbody>
                                     <tbody th:if="${not #lists.isEmpty(page.list)}">
                                     <tr class="gradeX" th:each="memorials,status : ${page.list}">
-                                        <td th:text="${status.count}"></td>
+                                        <td >
+                                            <input type="checkbox" name="cs" th:value="${memorials.memorialsId}" v-model="cs" th:text="${status.count}">
+                                        </td>
                                         <td th:switch="${memorials.memorialsStatus}">
                                             <span th:text="${memorials.memorialsTitle}" th:case="0" style="color: red;">奏折标题</span>
                                             <span th:text="${memorials.memorialsTitle}" th:case="1" style="color: blue;">奏折标题</span>
@@ -204,6 +208,6 @@
 <!--vue.js-->
 <script src="/js/vue.js"></script>
 <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
-<script src="/js/daywork.js"></script>
+<script src="/js/work.js"></script>
 </body>
 </html>

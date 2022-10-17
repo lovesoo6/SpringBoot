@@ -7,22 +7,19 @@ import com.study.springboot.service.EmpService;
 import com.study.springboot.service.MemorialsService;
 import com.study.springboot.util.UpLoadImg;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
-public class WorkServlet{
+public class WorkController {
     @Autowired
     private MemorialsService memorialsService;
     @Autowired
@@ -46,34 +43,39 @@ public class WorkServlet{
         }
         List<Emp> empList = empService.getAllEmp();
         page  = new PageInfo<>(memorialsList, 5);
-        System.out.println("page = " + page);
+        //System.out.println("page = " + page);
         model.addAttribute("page",page);
         model.addAttribute("empList",empList);
         // 3、渲染视图
         return "table/dynamic_table";
     }
-    @RequestMapping (value="/work/showMemorialsDigestList/{empPosition}/{empId}/{pageNum}/{action}")
-    protected String showMemorialsDigestList(
+    @RequestMapping (value="/work/showMemorialsDigestListBySerach/{empPosition}/{empId}/{pageNum}/{action}")
+    protected String showMemorialsDigestListBySerach(
             @PathVariable("empPosition") String  empPosition,
             @PathVariable("empId") String  empId,
             @PathVariable("pageNum") Integer pageNum,
             @RequestParam(name="memorialsTitle",defaultValue = "") String memorialsTitle,
             @RequestParam(name="memorialsName",defaultValue = "") String eId,
-            @RequestParam(name="memorialsStatus",defaultValue = "") String Status,
+            @RequestParam(name="memorialsStatus",defaultValue = "") String mStatus,
             Model model
-    ) throws JSONException {
+    ){
         // 1、调用 Service 方法查询数据
         //开启分页功能
-        String[] mStatus = new String[]{Status};
+        //String[] mStatus = new String[]{Status};
+        String[] s =  mStatus.split(",");
+        for (String i : s) {
+            System.out.println("i = " + i);
+        }
+        //System.out.println("mStatus = " + s);
         PageHelper.startPage(pageNum, 5);
         PageInfo<Memorials> page = new PageInfo<>();
         List<Memorials> memorialsList ;
         if(empPosition.equals("minister")){
-            memorialsList = memorialsService.getAllMemorialsDetailBySearch(memorialsTitle,"",mStatus,empId);
+            memorialsList = memorialsService.getAllMemorialsDetailBySearch(memorialsTitle,"",s,empId);
         }else{
-            memorialsList = memorialsService.getAllMemorialsDetailBySearch(memorialsTitle,eId,mStatus,"");
+            memorialsList = memorialsService.getAllMemorialsDetailBySearch(memorialsTitle,eId,s,"");
         }
-        System.out.println("memorialsList = " + memorialsList);
+        //System.out.println("memorialsList = " + memorialsList);
         if (memorialsList != null) {
             page  = new PageInfo<>(memorialsList, 5);
         }
@@ -83,7 +85,15 @@ public class WorkServlet{
         // 3、渲染视图
         return "table/dynamic_table";
     }
+    @ResponseBody
+    @RequestMapping (value="/work/deleteCheckedMemorials/",method = RequestMethod.POST)
+    protected void deleteCheckedMemorials(
+            @RequestParam("params") Map<String,Object> map,
+            Model model
+    ){
+        System.out.println("cs = " + map.get("ID"));
 
+    }
     @RequestMapping(value="/work/showMemorialsDetail/{memorialsId}/{empPosition}",method= RequestMethod.GET)
     protected String showMemorialsDetail(
             @PathVariable("memorialsId") Integer memorialsId,
