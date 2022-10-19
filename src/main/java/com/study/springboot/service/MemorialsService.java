@@ -25,4 +25,5 @@ public interface MemorialsService  {
     List<Memorials> getAllMemorialsDetailBySearch(String mTitle, String eId,String[] mStatus,String empId);
 
 
+    Integer deleteMemorialByIds(String[] str);
 }

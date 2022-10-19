@@ -112,4 +112,5 @@ public interface MemorialsMapper {
 
     List<Memorials> getAllMemorialsDetailBySearch(@Param("mTitle") String mTitle,@Param("eId") String eId, @Param("mStatus") String[] mStatus,@Param("empId") String empID);
 
+    Integer deleteMemorialByIds(String[] str);
 }

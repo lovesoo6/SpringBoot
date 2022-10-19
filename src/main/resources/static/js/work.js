@@ -8,8 +8,25 @@ new Vue({
         sc(){
             //发送get请求
             let aa = this.cs;
-            this.$http.post('/work/deleteCheckedMemorials/',{params:{ID:aa}},{emulateJSON:true}).then(function(res){
-                document.write(res.body);
+            /*axios.get('/work/deleteCheckedMemorialsByGet?id=11111', {
+                params: {
+                    name: 12345
+                }
+            }).then(function (response) {
+                    console.log(response);
+                }).catch(function (error) {
+                    console.log(error);
+                });*/
+
+            axios.post(
+                "/work/deleteCheckedMemorialsByPost",{
+                    params: {
+                        cs:aa,
+                    }
+                }
+
+            ).then(response=>{
+                console.log(response.data);
             },function(){
                 console.log('请求失败处理');
             });

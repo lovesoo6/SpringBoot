@@ -1,4 +1,7 @@
 package com.study.springboot.controller;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.study.springboot.entity.Emp;
@@ -7,13 +10,11 @@ import com.study.springboot.service.EmpService;
 import com.study.springboot.service.MemorialsService;
 import com.study.springboot.util.UpLoadImg;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -25,7 +26,7 @@ public class WorkController {
     @Autowired
     private EmpService empService;
     @RequestMapping (value="/work/showMemorialsDigestList/{empPosition}/{empId}/{pageNum}")
-    protected String showMemorialsDigestList(
+    public String showMemorialsDigestList(
             @PathVariable("empPosition") String  empPosition,
             @PathVariable("empId") String  empId,
             @PathVariable("pageNum") Integer pageNum,
@@ -50,7 +51,7 @@ public class WorkController {
         return "table/dynamic_table";
     }
     @RequestMapping (value="/work/showMemorialsDigestListBySerach/{empPosition}/{empId}/{pageNum}/{action}")
-    protected String showMemorialsDigestListBySerach(
+    public String showMemorialsDigestListBySerach(
             @PathVariable("empPosition") String  empPosition,
             @PathVariable("empId") String  empId,
             @PathVariable("pageNum") Integer pageNum,
@@ -86,16 +87,56 @@ public class WorkController {
         return "table/dynamic_table";
     }
     @ResponseBody
-    @RequestMapping (value="/work/deleteCheckedMemorials/",method = RequestMethod.POST)
-    protected void deleteCheckedMemorials(
-            @RequestParam("params") Map<String,Object> map,
-            Model model
+    @RequestMapping(value = "/work/deleteCheckedMemorialsByPost")
+    public JSONObject deleteCheckedMemorials(
+            @RequestBody String requestBody
     ){
-        System.out.println("cs = " + map.get("ID"));
+        JSONObject jsonObject = JSON.parseObject(requestBody);
+        System.out.println("jsonObject = " + jsonObject);
+        System.out.println("jsonObject = " + jsonObject.get("params"));
+        JSONObject jsonObject1 = JSON.parseObject(jsonObject.get("params").toString());
+        System.out.println("jsonObject1 = " + jsonObject1.get("cs"));
+        JSONArray jsonArray = jsonObject1.getJSONArray("cs");
+        String[] str = new String[jsonArray.size()];
+        int i = 0;
+        for (Object object:jsonArray) {
+            System.out.println("object = " + object);
+            str[i] = (String) object;
+            System.out.println(str[i]);
+            i++;
+        }
 
+        memorialsService.deleteMemorialByIds(str);
+        /*JSONArray jsonArray = jsonObject.getJSONArray("params");
+        */
+
+        JSONObject dataJsonObject = new JSONObject();
+
+        JSONArray dataJSONArray = new JSONArray();
+
+        JSONObject resultJSONObject = new JSONObject();
+
+        resultJSONObject.putIfAbsent("stat","成功");
+        resultJSONObject.putIfAbsent("code","200");
+
+        dataJSONArray.add(resultJSONObject);
+        dataJsonObject.putIfAbsent("data",dataJSONArray);
+        System.out.println("resultJSONObject = " + dataJsonObject);
+
+        return dataJsonObject;
+    }
+    @ResponseBody
+    @RequestMapping (value="/work/deleteCheckedMemorialsByGet")
+    public String deleteCheckedMemorialsByGet(
+            Integer id,String name
+    ){
+        System.out.println("id = " + id);
+        System.out.println("name = " + name);
+
+        return "sssss";
     }
     @RequestMapping(value="/work/showMemorialsDetail/{memorialsId}/{empPosition}",method= RequestMethod.GET)
-    protected String showMemorialsDetail(
+    public String showMemorialsDetail(
             @PathVariable("memorialsId") Integer memorialsId,
             @PathVariable("empPosition") String empPosition,
             Model model) {

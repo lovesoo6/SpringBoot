@@ -390,4 +390,13 @@
       </if>
     </where>
   </select>
+  <delete id="deleteMemorialByIds" >
+    DELETE from t_memorials
+        <where>
+          <if test="str!=null and str!=''">
+            t_memorials.memorials_id in
+                <foreach collection="str" item="id" separator="," open="(" close=")" >#{id}</foreach>
+          </if>
+        </where>
+  </delete>
 </mapper>

@@ -87,6 +87,9 @@ public class MemorialsServiceImpl implements MemorialsService {
         return null;
     }
 
-
-
+    @Override
+    public Integer deleteMemorialByIds(String[] str) {
+        Integer i = memorialsMapper.deleteMemorialByIds(str);
+        return i;
+    }
 }
